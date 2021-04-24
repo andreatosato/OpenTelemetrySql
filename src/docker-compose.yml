@@ -1,0 +1,42 @@
+version: '3.4'
+
+services:
+  sampleapi:
+    image: ${DOCKER_REGISTRY-}sampleapi
+    build:
+      context: .
+      dockerfile: SampleApi/Dockerfile
+  sampleworker:
+    image: ${DOCKER_REGISTRY-}sampleworker
+    build:
+      context: .
+      dockerfile: SampleWorker/Dockerfile
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - rabbitmq_go_net
+  db:
+    image: "mcr.microsoft.com/mssql/server"
+    ports:
+        - 1433:1433
+    environment:
+        SA_PASSWORD: "m1Password@12J"
+        ACCEPT_EULA: "Y"
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    environment:
+      - STORAGE_TYPE=mem
+    ports:
+      - 9411:9411
+
+networks:
+  rabbitmq_go_net:
+    driver: bridge
