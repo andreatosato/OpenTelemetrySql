@@ -8,18 +8,23 @@ services:
       dockerfile: SampleApi/Dockerfile
     environment:
       - RABBITMQ_HOSTNAME=rabbitmq
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+      - "RABBITMQ_DEFAULT_PASS=pass"
+      - "RABBITMQ_DEFAULT_USER=user"
     depends_on:
       - rabbitmq
       - zipkin
       - db
+      - sampleworker
 
   sampleworker:
     image: ${DOCKER_REGISTRY-}sampleworker
     build:
       context: .
       dockerfile: SampleWorker/Dockerfile
+    environment:
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - "RABBITMQ_DEFAULT_PASS=pass"
+      - "RABBITMQ_DEFAULT_USER=user"
     depends_on:
       - rabbitmq
       - zipkin
@@ -27,9 +32,10 @@ services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
+    hostname: 'rabbitmq'
     environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+     - "RABBITMQ_DEFAULT_PASS=pass"
+     - "RABBITMQ_DEFAULT_USER=user"
     ports:
         - "4369:4369"
         - "5671:5671"
@@ -40,8 +46,6 @@ services:
     volumes:
         - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
         - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-    networks:
-        - rabbitmq_go_net
 
   db:
     image: "mcr.microsoft.com/mssql/server"
@@ -56,7 +60,3 @@ services:
     container_name: zipkin
     ports:
       - 9411:9411
-
-networks:
-  rabbitmq_go_net:
-    driver: bridge
