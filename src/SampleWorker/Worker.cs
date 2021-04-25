@@ -1,29 +1,36 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
+using SampleWorker.Messages;
 
 namespace SampleWorker
 {
-    public class Worker : BackgroundService
+    public partial class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly MessageReceiver messageReceiver;
 
-        public Worker(ILogger<Worker> logger)
+        public Worker(MessageReceiver messageReceiver)
         {
-            _logger = logger;
+            this.messageReceiver = messageReceiver;
+        }
+
+        public override Task StartAsync(CancellationToken cancellationToken)
+        {
+            return base.StartAsync(cancellationToken);
+        }
+
+        public override async Task StopAsync(CancellationToken cancellationToken)
+        {
+            await base.StopAsync(cancellationToken);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(1000, stoppingToken);
-            }
+            stoppingToken.ThrowIfCancellationRequested();
+
+            this.messageReceiver.StartConsumer();
+
+            await Task.CompletedTask;
         }
     }
 }

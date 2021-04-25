@@ -1,9 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Trace;
+using SampleWorker.Messages;
 
 namespace SampleWorker
 {
@@ -19,6 +18,19 @@ namespace SampleWorker
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();
+
+
+                    services.AddSingleton<MessageReceiver>();
+
+                    services.AddOpenTelemetryTracing((builder) =>
+                    {
+                        builder
+                            .AddSource(nameof(MessageReceiver))
+                            .AddZipkinExporter();
+                    });
+                    services.Configure<AspNetCoreInstrumentationOptions>(hostContext.Configuration.GetSection("AspNetCoreInstrumentation"));
                 });
+
+
     }
 }
