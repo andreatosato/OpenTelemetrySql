@@ -6,14 +6,31 @@ services:
     build:
       context: .
       dockerfile: SampleApi/Dockerfile
+    environment:
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    depends_on:
+      - rabbitmq
+      - zipkin
+      - db
+
   sampleworker:
     image: ${DOCKER_REGISTRY-}sampleworker
     build:
       context: .
       dockerfile: SampleWorker/Dockerfile
+    depends_on:
+      - rabbitmq
+      - zipkin
+      - db
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
     ports:
         - 5672:5672
         - 15672:15672
@@ -22,6 +39,7 @@ services:
         - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
         - rabbitmq_go_net
+
   db:
     image: "mcr.microsoft.com/mssql/server"
     ports:
@@ -29,11 +47,10 @@ services:
     environment:
         SA_PASSWORD: "m1Password@12J"
         ACCEPT_EULA: "Y"
+
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
-    environment:
-      - STORAGE_TYPE=mem
     ports:
       - 9411:9411
 

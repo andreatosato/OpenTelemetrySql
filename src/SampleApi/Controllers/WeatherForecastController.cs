@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using SampleApi.Messages;
 
 namespace SampleApi.Controllers
 {
@@ -17,15 +19,25 @@ namespace SampleApi.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly MessageSender messageSender;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, MessageSender messageSender)
         {
+            if (messageSender == null)
+            {
+                throw new ArgumentNullException(nameof(messageSender));
+            }
+
             _logger = logger;
+            this.messageSender = messageSender;
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<IEnumerable<WeatherForecast>> Get()
         {
+            messageSender.SendMessage();
+            _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
+            var res = await new HttpClient().GetStringAsync("http://google.com");
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
