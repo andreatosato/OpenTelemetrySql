@@ -4,12 +4,12 @@ services:
   sampleapi:
     image: ${DOCKER_REGISTRY-}sampleapi
     build:
-      context: .
-      dockerfile: SampleApi/Dockerfile
+      context: SampleApi
+      dockerfile: ./Dockerfile
     environment:
       - RABBITMQ_HOSTNAME=rabbitmq
-      - "RABBITMQ_DEFAULT_PASS=pass"
-      - "RABBITMQ_DEFAULT_USER=user"
+      - RABBITMQ_DEFAULT_PASS=sAmple2021
+      - RABBITMQ_DEFAULT_USER=sample
     depends_on:
       - rabbitmq
       - zipkin
@@ -23,29 +23,26 @@ services:
       dockerfile: SampleWorker/Dockerfile
     environment:
       - RABBITMQ_HOSTNAME=rabbitmq
-      - "RABBITMQ_DEFAULT_PASS=pass"
-      - "RABBITMQ_DEFAULT_USER=user"
+      - RABBITMQ_DEFAULT_PASS=sAmple2021
+      - RABBITMQ_DEFAULT_USER=sample
     depends_on:
       - rabbitmq
       - zipkin
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq'
-    hostname: 'rabbitmq'
+    container_name: rabbitmq
+    hostname: rabbitmq
     environment:
-     - "RABBITMQ_DEFAULT_PASS=pass"
-     - "RABBITMQ_DEFAULT_USER=user"
-    ports:
-        - "4369:4369"
-        - "5671:5671"
+      RABBITMQ_DEFAULT_USER: "sample"
+      RABBITMQ_DEFAULT_PASS: "sAmple2021"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:        
         - "5672:5672"
-        - "25672:25672"
-        - "15671:15671"
         - "15672:15672"
     volumes:
-        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+        - rabbitmqdata/:/var/lib/rabbitmq/
+        - rabbitmqdata/:/var/log/rabbitmq/
 
   db:
     image: "mcr.microsoft.com/mssql/server"
@@ -54,9 +51,17 @@ services:
     environment:
         SA_PASSWORD: "m1Password@12J"
         ACCEPT_EULA: "Y"
+    volumes:
+      - sqlserverdata:/var/lib/sqlserver
 
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
       - 9411:9411
+
+volumes:
+  sqlserverdata:
+    driver: local
+  rabbitmqdata:
+    driver: local
