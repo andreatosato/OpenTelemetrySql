@@ -23,7 +23,6 @@ services:
     depends_on:
       - rabbitmq
       - zipkin
-      - db
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -32,8 +31,12 @@ services:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
     ports:
-        - 5672:5672
-        - 15672:15672
+        - "4369:4369"
+        - "5671:5671"
+        - "5672:5672"
+        - "25672:25672"
+        - "15671:15671"
+        - "15672:15672"
     volumes:
         - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
         - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
