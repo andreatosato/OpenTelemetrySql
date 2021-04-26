@@ -47,6 +47,7 @@ services:
 
   db:
     image: "mcr.microsoft.com/mssql/server"
+    container_name: sqlserver
     ports:
         - 1433:1433
     environment:
@@ -57,7 +58,7 @@ services:
 
   zipkin:
     image: openzipkin/zipkin
-    container_name: zipkin
+    container_name: zipkin_trace
     ports:
       - 9411:9411
 
