@@ -7,7 +7,7 @@ namespace SampleApi.Messages
 {
     public static class RabbitMqHelper
     {
-        public const string DefaultExchangeName = "TestExchange";
+        public const string DefaultExchangeName = "";
         public const string TestQueueName = "TestQueue";
 
         private static readonly ConnectionFactory ConnectionFactory;

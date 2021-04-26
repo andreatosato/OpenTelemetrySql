@@ -25,6 +25,7 @@ services:
       - RABBITMQ_HOSTNAME=rabbitmq
       - RABBITMQ_DEFAULT_PASS=sAmple2021
       - RABBITMQ_DEFAULT_USER=sample
+    restart: on-failure
     depends_on:
       - rabbitmq
       - zipkin

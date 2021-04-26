@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace SampleApi.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly MessageSender messageSender;
+        private readonly ActivitySource s_source = new ActivitySource("Sample");
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger, MessageSender messageSender)
         {
@@ -35,17 +37,31 @@ namespace SampleApi.Controllers
         [HttpGet]
         public async Task<IEnumerable<WeatherForecast>> Get()
         {
-            messageSender.SendMessage();
-            _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
-            var res = await new HttpClient().GetStringAsync("http://google.com");
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            using (Activity? activity = s_source.StartActivity("StartController"))
             {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+                using (Activity? activityMessage = s_source.StartActivity("SendMessage"))
+                {
+                    messageSender.SendMessage();
+                }
+
+                using (Activity? activityMessage = s_source.StartActivity("Google"))
+                {
+                    _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
+                    var res = await new HttpClient().GetStringAsync("http://google.com");
+                }
+
+                using (Activity? activityMessage = s_source.StartActivity("Randomize"))
+                {
+                    var rng = new Random();
+                    return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+                    {
+                        Date = DateTime.Now.AddDays(index),
+                        TemperatureC = rng.Next(-20, 55),
+                        Summary = Summaries[rng.Next(Summaries.Length)]
+                    })
+                    .ToArray();
+                }
+            }
         }
     }
 }
