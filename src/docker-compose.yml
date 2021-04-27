@@ -10,6 +10,7 @@ services:
       - RABBITMQ_HOSTNAME=rabbitmq
       - RABBITMQ_DEFAULT_PASS=sAmple2021
       - RABBITMQ_DEFAULT_USER=sample
+      - ZIPKIN_HOSTNAME=zipkin
     depends_on:
       - rabbitmq
       - zipkin
@@ -25,6 +26,7 @@ services:
       - RABBITMQ_HOSTNAME=rabbitmq
       - RABBITMQ_DEFAULT_PASS=sAmple2021
       - RABBITMQ_DEFAULT_USER=sample
+      - ZIPKIN_HOSTNAME=zipkin
     restart: on-failure
     depends_on:
       - rabbitmq
@@ -58,7 +60,6 @@ services:
 
   zipkin:
     image: openzipkin/zipkin
-    container_name: zipkin_trace
     ports:
       - 9411:9411
 

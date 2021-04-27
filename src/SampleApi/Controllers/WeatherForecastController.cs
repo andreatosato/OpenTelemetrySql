@@ -39,19 +39,21 @@ namespace SampleApi.Controllers
         {
             using (Activity? activity = s_source.StartActivity("StartController"))
             {
-                using (Activity? activityMessage = s_source.StartActivity("SendMessage"))
+                using (Activity activityMessage = s_source.StartActivity("SendMessage"))
                 {
+                    _logger.LogInformation("Send message data to rabbitmq");
                     messageSender.SendMessage();
                 }
 
-                using (Activity? activityMessage = s_source.StartActivity("Google"))
+                using (Activity activityMessage = s_source.StartActivity("Google"))
                 {
                     _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
                     var res = await new HttpClient().GetStringAsync("http://google.com");
                 }
 
-                using (Activity? activityMessage = s_source.StartActivity("Randomize"))
+                using (Activity activityMessage = s_source.StartActivity("Randomize"))
                 {
+                    _logger.LogInformation("Randomize data");
                     var rng = new Random();
                     return Enumerable.Range(1, 5).Select(index => new WeatherForecast
                     {

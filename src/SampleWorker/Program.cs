@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Instrumentation.AspNetCore;
@@ -26,7 +27,12 @@ namespace SampleWorker
                     {
                         builder
                             .AddSource(nameof(MessageReceiver))
-                            .AddZipkinExporter();
+                            .AddAspNetCoreInstrumentation()
+                            .AddZipkinExporter(b =>
+                            {
+                                var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
+                                b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                            });
                     });
                     services.Configure<AspNetCoreInstrumentationOptions>(hostContext.Configuration.GetSection("AspNetCoreInstrumentation"));
                 });
