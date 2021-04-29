@@ -1,13 +1,16 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using SampleApi.Messages;
+using SampleDatabase;
 
 namespace SampleApi
 {
@@ -29,7 +32,16 @@ namespace SampleApi
             });
             services.AddSingleton<MessageSender>();
 
+            services.AddDbContext<SampleContext>(x =>
+            {
+                x.UseSqlServer(Configuration.GetConnectionString("Default"))
+                .EnableSensitiveDataLogging()
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            });
+
             services.AddOpenTelemetryTracing((builder) => builder
+                        .AddSource("Sample")
+                        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("zipkin-test"))
                         .AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation()
                         .AddNewRelicExporter(options => options.ApiKey = Configuration.GetValue<string>("NewRelic:ApiKey"))
@@ -41,10 +53,12 @@ namespace SampleApi
             services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("AspNetCoreInstrumentation"));
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SampleContext db)
         {
             if (env.IsDevelopment())
             {
+                db.Database.Migrate();
+
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SampleApi v1"));

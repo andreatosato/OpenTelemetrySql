@@ -27,4 +27,8 @@
     <Folder Include="Entities\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\SampleDatabase\SampleDatabase.csproj" />
+  </ItemGroup>
+
 </Project>
