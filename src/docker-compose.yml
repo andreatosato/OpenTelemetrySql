@@ -16,8 +16,6 @@ services:
       - zipkin
       - db
       - sampleworker
-    networks: 
-      - backend
 
   sampleapidue:
     image: ${DOCKER_REGISTRY-}sampleapidue
@@ -28,8 +26,6 @@ services:
       - ZIPKIN_HOSTNAME=zipkin
     depends_on:
       - zipkin
-    networks: 
-      - backend
 
   sampleworker:
     image: ${DOCKER_REGISTRY-}sampleworker
@@ -45,8 +41,6 @@ services:
     depends_on:
       - rabbitmq
       - zipkin
-    networks: 
-      - backend
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -62,8 +56,6 @@ services:
     volumes:
         - rabbitmqdata/:/var/lib/rabbitmq/
         - rabbitmqdata/:/var/log/rabbitmq/
-    networks: 
-      - backend
 
   db:
     image: "mcr.microsoft.com/mssql/server"
@@ -75,23 +67,15 @@ services:
         ACCEPT_EULA: "Y"
     volumes:
       - sqlserverdata:/var/lib/sqlserver
-    networks: 
-      - backend
 
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
       - 9411:9411
-    networks: 
-      - backend
 
 volumes:
   sqlserverdata:
     driver: local
   rabbitmqdata:
     driver: local
-
-networks:
-  backend:
-    driver: bridge

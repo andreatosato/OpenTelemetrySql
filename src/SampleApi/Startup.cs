@@ -68,7 +68,7 @@ namespace SampleApi
 
             services.AddHttpClient("SampleApiDue", h =>
             {
-                h.BaseAddress = new Uri("http://sampleapidue/api/");
+                h.BaseAddress = new Uri("http://sampleapidue:5010/api/");
             });
         }
 

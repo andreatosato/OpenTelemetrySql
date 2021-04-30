@@ -90,8 +90,6 @@ namespace SampleApi.Controllers
                     })
                     .ToArray();
                 }
-
-                activity.Stop();
             }
         }
     }
