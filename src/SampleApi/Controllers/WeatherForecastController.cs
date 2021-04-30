@@ -61,6 +61,7 @@ namespace SampleApi.Controllers
                 using (Activity activityMessage = source.StartActivity("Sample API 2 Activity").SetTag("type", "API 2 Type"))
                 {
                     _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
+                    _logger.LogInformation($"Base address: {sampleApiDueClient.BaseAddress}/WeatherForecast");
                     var res = await sampleApiDueClient.GetStringAsync("WeatherForecast");
                     _logger.LogInformation("Data from API 2: {@res}", res);
                     activityMessage.Stop();
