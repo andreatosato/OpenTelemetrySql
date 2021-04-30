@@ -17,7 +17,7 @@ services:
       - db
       - sampleworker
     networks: 
-      - local
+      - backend
 
   sampleapidue:
     image: ${DOCKER_REGISTRY-}sampleapidue
@@ -29,7 +29,7 @@ services:
     depends_on:
       - zipkin
     networks: 
-      - local
+      - backend
 
   sampleworker:
     image: ${DOCKER_REGISTRY-}sampleworker
@@ -46,7 +46,7 @@ services:
       - rabbitmq
       - zipkin
     networks: 
-      - local
+      - backend
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -63,7 +63,7 @@ services:
         - rabbitmqdata/:/var/lib/rabbitmq/
         - rabbitmqdata/:/var/log/rabbitmq/
     networks: 
-      - local
+      - backend
 
   db:
     image: "mcr.microsoft.com/mssql/server"
@@ -76,7 +76,7 @@ services:
     volumes:
       - sqlserverdata:/var/lib/sqlserver
     networks: 
-      - local
+      - backend
 
   zipkin:
     image: openzipkin/zipkin
@@ -84,7 +84,7 @@ services:
     ports:
       - 9411:9411
     networks: 
-      - local
+      - backend
 
 volumes:
   sqlserverdata:
@@ -93,6 +93,5 @@ volumes:
     driver: local
 
 networks:
-  local:
-    driver:
-        bridge
+  backend:
+    driver: bridge

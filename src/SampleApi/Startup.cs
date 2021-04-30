@@ -66,7 +66,10 @@ namespace SampleApi
                         }));
             services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("AspNetCoreInstrumentation"));
 
-            services.AddHttpClient("SampleApiDue", h => h.BaseAddress = new Uri("http://sampleapidue/"));
+            services.AddHttpClient("SampleApiDue", h =>
+            {
+                h.BaseAddress = new Uri("http://sampleapidue/api/");
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SampleContext db)
