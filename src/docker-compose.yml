@@ -17,11 +17,21 @@ services:
       - db
       - sampleworker
 
+  sampleapidue:
+    image: ${DOCKER_REGISTRY-}sampleapidue
+    build:
+      context: SampleApiDue
+      dockerfile: ./Dockerfile
+    environment:
+      - ZIPKIN_HOSTNAME=zipkin
+    depends_on:
+      - zipkin
+
   sampleworker:
     image: ${DOCKER_REGISTRY-}sampleworker
     build:
-      context: .
-      dockerfile: SampleWorker/Dockerfile
+      context: SampleWorker
+      dockerfile: ./Dockerfile
     environment:
       - RABBITMQ_HOSTNAME=rabbitmq
       - RABBITMQ_DEFAULT_PASS=sAmple2021
@@ -60,6 +70,7 @@ services:
 
   zipkin:
     image: openzipkin/zipkin
+    container_name: zipkin
     ports:
       - 9411:9411
 

@@ -41,16 +41,32 @@ namespace SampleApi
 
             services.AddOpenTelemetryTracing((builder) => builder
                         .AddSource("Sample")
-                        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("zipkin-test"))
-                        .AddAspNetCoreInstrumentation()
+                        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("SampleApi").AddTelemetrySdk())
+                        .AddSqlClientInstrumentation(s =>
+                        {
+                            s.SetDbStatementForStoredProcedure = true;
+                            s.SetDbStatementForText = true;
+                            s.RecordException = true;
+                        })
+                        .AddAspNetCoreInstrumentation(options =>
+                        {
+                            options.Filter = (req) => !req.Request.Path.ToUriComponent().Contains("swagger", StringComparison.OrdinalIgnoreCase);
+                        })
                         .AddHttpClientInstrumentation()
-                        .AddNewRelicExporter(options => options.ApiKey = Configuration.GetValue<string>("NewRelic:ApiKey"))
+                        .AddConsoleExporter()
+                        .AddNewRelicExporter(options =>
+                        {
+                            options.ApiKey = Configuration.GetValue<string>("NewRelic:ApiKey");
+                            options.Endpoint = new Uri("https://metric-api.eu.newrelic.com/trace/v1");
+                        })
                         .AddZipkinExporter(b =>
                         {
                             var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
                             b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
                         }));
             services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("AspNetCoreInstrumentation"));
+
+            services.AddHttpClient("SampleApiDue", h => h.BaseAddress = new Uri("http://sampleapidue/"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SampleContext db)
