@@ -62,7 +62,8 @@ namespace SampleApi.Controllers
                 {
                     _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
                     _logger.LogInformation($"Base address: {sampleApiDueClient.BaseAddress}/WeatherForecast");
-                    var res = await sampleApiDueClient.GetStringAsync("WeatherForecast");
+                    var r = await sampleApiDueClient.GetAsync("/WeatherForecast2");
+                    var res = await sampleApiDueClient.GetStringAsync("/WeatherForecast2");
                     _logger.LogInformation("Data from API 2: {@res}", res);
                     activityMessage.Stop();
                 }

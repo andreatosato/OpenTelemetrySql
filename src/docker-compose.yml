@@ -16,6 +16,7 @@ services:
       - zipkin
       - db
       - sampleworker
+      - sampleapidue
 
   sampleapidue:
     image: ${DOCKER_REGISTRY-}sampleapidue

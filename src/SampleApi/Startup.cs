@@ -68,7 +68,7 @@ namespace SampleApi
 
             services.AddHttpClient("SampleApiDue", h =>
             {
-                h.BaseAddress = new Uri("http://sampleapidue:5010/");
+                h.BaseAddress = new Uri("http://sampleapi2:5010");
             });
         }
 
@@ -83,7 +83,7 @@ namespace SampleApi
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SampleApi v1"));
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
