@@ -23,7 +23,7 @@ namespace SampleApi.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly MessageSender messageSender;
-        private readonly ActivitySource s_source = new ActivitySource("Sample");
+        private readonly ActivitySource source = new ActivitySource("Sample");
         private readonly SampleContext db;
         private readonly HttpClient sampleApiDueClient;
 
@@ -41,9 +41,9 @@ namespace SampleApi.Controllers
         [HttpGet]
         public async Task<IEnumerable<WeatherForecast>> Get()
         {
-            using (Activity activity = s_source.StartActivity("StartController"))
+            using (Activity activity = source.StartActivity("StartController"))
             {
-                using (Activity activityMessage = s_source.StartActivity("Rabbit").SetParentId(activity.Id).SetTag("type", "RabbitType"))
+                using (Activity activityMessage = source.StartActivity("Rabbit").SetParentId(activity.Id).SetTag("type", "RabbitType"))
                 {
                     _logger.LogInformation("Send message data to rabbitmq");
                     activityMessage.AddBaggage("baggage-name", "my-value-baggage");
@@ -51,22 +51,22 @@ namespace SampleApi.Controllers
                     activityMessage.Stop();
                 }
 
-                using (Activity activityMessage = s_source.StartActivity("Google Activity").SetParentId(activity.Id).SetTag("type", "GoogleType"))
+                using (Activity activityMessage = source.StartActivity("Google Activity").SetParentId(activity.Id).SetTag("type", "GoogleType"))
                 {
                     _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
                     var res = await new HttpClient().GetStringAsync("http://google.com");
                     activityMessage.Stop();
                 }
 
-                using (Activity activityMessage = s_source.StartActivity("Sample API 2 Activity").SetParentId(activity.Id).SetTag("type", "API 2 Type"))
-                {
-                    _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
-                    var res = await sampleApiDueClient.GetStringAsync("api/WeatherForecast");
-                    _logger.LogInformation("Data from API 2: {@res}", res);
-                    activityMessage.Stop();
-                }
+                //using (Activity activityMessage = s_source.StartActivity("Sample API 2 Activity").SetParentId(activity.Id).SetTag("type", "API 2 Type"))
+                //{
+                //    _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
+                //    var res = await sampleApiDueClient.GetStringAsync("api/WeatherForecast");
+                //    _logger.LogInformation("Data from API 2: {@res}", res);
+                //    activityMessage.Stop();
+                //}
 
-                using (Activity activityMessage = s_source.StartActivity("Database").SetParentId(activity.Id).SetTag("type", "DatanaseType"))
+                using (Activity activityMessage = source.StartActivity("Database").SetParentId(activity.Id).SetTag("type", "DatanaseType"))
                 {
                     _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
                     var blog = await db.Blogs
@@ -78,7 +78,7 @@ namespace SampleApi.Controllers
                     activityMessage.Stop();
                 }
 
-                using (Activity activityMessage = s_source.StartActivity("Random").SetParentId(activity.Id).SetTag("type", "RandomType"))
+                using (Activity activityMessage = source.StartActivity("Random").SetParentId(activity.Id).SetTag("type", "RandomType"))
                 {
                     _logger.LogInformation("Randomize data");
                     var rng = new Random();

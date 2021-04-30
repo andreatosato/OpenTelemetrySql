@@ -2,6 +2,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using SampleWorker.Messages;
 
@@ -27,7 +28,9 @@ namespace SampleWorker
                     {
                         builder
                             .AddSource(nameof(MessageReceiver))
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("SampleWorker").AddTelemetrySdk())
                             .AddAspNetCoreInstrumentation()
+                            .AddHttpClientInstrumentation()
                             .AddZipkinExporter(b =>
                             {
                                 var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";

@@ -20,6 +20,7 @@ namespace SampleWorker.Messages
         private readonly ILogger<MessageReceiver> logger;
         private readonly IConnection connection;
         private readonly IModel channel;
+        private readonly ActivitySource activitySource = new ActivitySource(nameof(MessageReceiver));
 
         public MessageReceiver(ILogger<MessageReceiver> logger)
         {
@@ -63,7 +64,7 @@ namespace SampleWorker.Messages
                     RabbitMqHelper.AddMessagingTags(activity);
 
                     // Simulate some work
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
                 }
                 catch (Exception ex)
                 {
