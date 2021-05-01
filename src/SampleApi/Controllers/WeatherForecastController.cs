@@ -62,13 +62,13 @@ namespace SampleApi.Controllers
                 {
                     _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
                     _logger.LogInformation($"Base address: {sampleApiDueClient.BaseAddress}/WeatherForecast");
-                    var r = await sampleApiDueClient.GetAsync("/WeatherForecast2");
-                    var res = await sampleApiDueClient.GetStringAsync("/WeatherForecast2");
+                    var r = await sampleApiDueClient.GetAsync("WeatherForecast");
+                    var res = await sampleApiDueClient.GetStringAsync("/WeatherForecast");
                     _logger.LogInformation("Data from API 2: {@res}", res);
                     activityMessage.Stop();
                 }
 
-                using (Activity activityMessage = source.StartActivity("Database").SetTag("type", "DatanaseType"))
+                using (Activity activityMessage = source.StartActivity("Database").SetTag("type", "DatabaseType"))
                 {
                     _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
                     var blog = await db.Blogs

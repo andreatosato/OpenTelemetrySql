@@ -16,12 +16,12 @@ services:
       - zipkin
       - db
       - sampleworker
-      - sampleapidue
+      - sampleapitre
 
-  sampleapidue:
-    image: ${DOCKER_REGISTRY-}sampleapidue
+  sampleapitre:
+    image: ${DOCKER_REGISTRY-}sampleapitre
     build:
-      context: SampleApiDue
+      context: SampleApi3
       dockerfile: ./Dockerfile
     environment:
       - ZIPKIN_HOSTNAME=zipkin
