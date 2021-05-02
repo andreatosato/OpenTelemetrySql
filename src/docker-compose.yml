@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.7'
 
 services:
   sampleapi:
@@ -11,12 +11,15 @@ services:
       - RABBITMQ_DEFAULT_PASS=sAmple2021
       - RABBITMQ_DEFAULT_USER=sample
       - ZIPKIN_HOSTNAME=zipkin
+      - Jaeger__AgentHost=jaeger
     depends_on:
       - rabbitmq
       - zipkin
+      - jaeger
       - db
       - sampleworker
       - sampleapitre
+      - prometheus
 
   sampleapitre:
     image: ${DOCKER_REGISTRY-}sampleapitre
@@ -73,10 +76,34 @@ services:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
+      - 9412:9411
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    container_name: jaeger
+    restart: on-failure
+    ports:
+      - 5775:5775/udp
+      - 5778:5778
+      - 6831:6831/udp
+      - 6832:6832/udp
       - 9411:9411
+      - 14268:14268
+      - 16686:16686
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - prometheus:/prometheus
+      - ./../config/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    restart: on-failure
 
 volumes:
   sqlserverdata:
     driver: local
   rabbitmqdata:
     driver: local
+  prometheus:

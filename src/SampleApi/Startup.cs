@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -54,17 +55,24 @@ namespace SampleApi
                         })
                         .AddHttpClientInstrumentation()
                         .AddConsoleExporter()
-                        .AddNewRelicExporter(options =>
-                        {
-                            options.ApiKey = Configuration.GetValue<string>("NewRelic:ApiKey");
-                            options.Endpoint = new Uri("https://metric-api.eu.newrelic.com/trace/v1");
-                        })
+                        //.AddNewRelicExporter(options =>
+                        //{
+                        //    options.ApiKey = Configuration.GetValue<string>("NewRelic:ApiKey");
+                        //    options.Endpoint = new Uri("https://metric-api.eu.newrelic.com/trace/v1");
+                        //})
                         .AddZipkinExporter(b =>
                         {
                             var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
                             b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
-                        }));
+                        })
+                        .AddJaegerExporter(b =>
+                        {
+                            b.AgentHost = "jaeger";
+                            b.AgentPort = 6831;
+                        })
+                    );
             services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("AspNetCoreInstrumentation"));
+            services.Configure<JaegerExporterOptions>(this.Configuration.GetSection("Jaeger"));
 
             services.AddHttpClient("SampleApiDue", h =>
             {
