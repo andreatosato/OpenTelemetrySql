@@ -21,6 +21,16 @@ services:
       - sampleapitre
       - prometheus
 
+  sampleapidue:
+    image: ${DOCKER_REGISTRY-}sampleapidue
+    build:
+      context: SampleApiDue
+      dockerfile: ./Dockerfile
+    environment:
+      - ZIPKIN_HOSTNAME=zipkin
+    depends_on:
+      - zipkin
+
   sampleapitre:
     image: ${DOCKER_REGISTRY-}sampleapitre
     build:

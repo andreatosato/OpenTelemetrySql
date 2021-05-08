@@ -26,6 +26,7 @@ namespace SampleApi.Controllers
         private readonly ActivitySource source = new ActivitySource("Sample");
         private readonly SampleContext db;
         private readonly HttpClient sampleApiDueClient;
+        private readonly HttpClient sampleApiTreClient;
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger,
             MessageSender messageSender,
@@ -36,6 +37,7 @@ namespace SampleApi.Controllers
             this.messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
             this.db = db ?? throw new ArgumentNullException(nameof(db));
             this.sampleApiDueClient = httpClientFactory.CreateClient("SampleApiDue");
+            this.sampleApiTreClient = httpClientFactory.CreateClient("SampleApiTre");
         }
 
         [HttpGet]
@@ -65,6 +67,16 @@ namespace SampleApi.Controllers
                     var r = await sampleApiDueClient.GetAsync("WeatherForecast");
                     var res = await sampleApiDueClient.GetStringAsync("/WeatherForecast");
                     _logger.LogInformation("Data from API 2: {@res}", res);
+                    activityMessage.Stop();
+                }
+
+                using (Activity activityMessage = source.StartActivity("Sample API 3 Activity").SetTag("type", "API 2 Type"))
+                {
+                    _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
+                    _logger.LogInformation($"Base address: {sampleApiDueClient.BaseAddress}/WeatherForecast");
+                    var r = await sampleApiTreClient.GetAsync("WeatherForecast");
+                    var res = await sampleApiTreClient.GetStringAsync("/WeatherForecast");
+                    _logger.LogInformation("Data from API 3: {@res}", res);
                     activityMessage.Stop();
                 }
 

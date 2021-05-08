@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -74,10 +75,16 @@ namespace SampleApi
             services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("AspNetCoreInstrumentation"));
             services.Configure<JaegerExporterOptions>(this.Configuration.GetSection("Jaeger"));
 
-            services.AddHttpClient("SampleApiDue", h =>
+            services.AddHttpClient("SampleApiTre", h =>
             {
                 h.BaseAddress = new Uri("http://sampleapitre/");
             });
+
+            services.AddHttpClient("SampleApiDue", h =>
+            {
+                h.BaseAddress = new Uri("https://sampleapidue/");
+            })
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { ServerCertificateCustomValidationCallback = (HttpRequestMessage, X509Certificate2, X509Chain, SslPolicyErrors) => true });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SampleContext db)
