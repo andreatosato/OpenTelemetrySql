@@ -61,17 +61,24 @@ namespace SampleApi
                         //    options.ApiKey = Configuration.GetValue<string>("NewRelic:ApiKey");
                         //    options.Endpoint = new Uri("https://metric-api.eu.newrelic.com/trace/v1");
                         //})
-                        .AddZipkinExporter(b =>
+                        //.AddZipkinExporter(b =>
+                        //{
+                        //    var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
+                        //    b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                        //})
+                        //.AddJaegerExporter(b =>
+                        //{
+                        //    b.AgentHost = "jaeger";
+                        //    b.AgentPort = 6831;
+                        //})
+                        .AddOtlpExporter(otlpOptions =>
                         {
-                            var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
-                            b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                            otlpOptions.Endpoint = new Uri(this.Configuration.GetValue<string>("Otlp:Endpoint"));
                         })
-                        .AddJaegerExporter(b =>
-                        {
-                            b.AgentHost = "jaeger";
-                            b.AgentPort = 6831;
-                        })
+
                     );
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
             services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("AspNetCoreInstrumentation"));
             services.Configure<JaegerExporterOptions>(this.Configuration.GetSection("Jaeger"));
 
