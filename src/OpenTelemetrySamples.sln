@@ -18,7 +18,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleDatabase", "SampleDat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApi3", "SampleApi3\SampleApi3.csproj", "{6FAB8DE9-F9EF-410A-8067-BC237E9E97E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApiDue", "SampleApiDue\SampleApiDue.csproj", "{510AC740-8CA1-4A6C-8065-0B157C17B427}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApiDue", "SampleApiDue\SampleApiDue.csproj", "{510AC740-8CA1-4A6C-8065-0B157C17B427}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "otel", "otel", "{2176E700-3911-40BE-AC7F-80EA8E717E22}"
+	ProjectSection(SolutionItems) = preProject
+		..\config\otel-agent-config.yaml = ..\config\otel-agent-config.yaml
+		..\config\otel-collector-config.yaml = ..\config\otel-collector-config.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

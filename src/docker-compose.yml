@@ -20,6 +20,7 @@ services:
       - sampleworker
       - sampleapitre
       - prometheus
+      - otel-agent
 
   sampleapidue:
     image: ${DOCKER_REGISTRY-}sampleapidue

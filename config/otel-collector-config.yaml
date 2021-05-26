@@ -19,6 +19,17 @@ exporters:
     endpoint: jaeger:14250
     insecure: true
 
+  newrelic:
+    apikey: NRAK-LJIAVTJ8KIG666PH5DXDCBRB2EG
+    timeout: 30s
+    traces:
+      host_override: trace-api.eu.newrelic.com
+      timeout: 20s
+    metrics:
+      host_override: metric-api.eu.newrelic.com
+    logs:
+      host_override: log-api.eu.newrelic.com
+
 processors:
   batch:
 
