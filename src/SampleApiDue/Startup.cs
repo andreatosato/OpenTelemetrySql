@@ -36,11 +36,17 @@ namespace SampleApiDue
                 .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("SampleApiDueService").AddTelemetrySdk())
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
-                .AddZipkinExporter(b =>
+                .AddOtlpExporter(otlpOptions =>
                 {
-                    var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
-                    b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
-                }));
+                    otlpOptions.Endpoint = new Uri("http://otel-collector:4317");
+                    // this.Configuration.GetValue<string>("Otlp:Endpoint"));
+                })
+                //.AddZipkinExporter(b =>
+                //{
+                //    var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
+                //    b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                //})
+                );
 
             services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("AspNetCoreInstrumentation"));
         }

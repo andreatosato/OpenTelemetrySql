@@ -87,7 +87,7 @@ services:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
-      - 9412:9411
+      - 9411:9411
 
   jaeger:
     image: jaegertracing/all-in-one
@@ -98,7 +98,7 @@ services:
       - 5778:5778
       - 6831:6831/udp
       - 6832:6832/udp
-      - 9411:9411
+      #- 9411:9411
       - 14268:14268
       - 16686:16686
       - 14250:14250
