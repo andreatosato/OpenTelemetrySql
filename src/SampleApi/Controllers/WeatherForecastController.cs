@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SampleApi.Messages;
 using SampleDatabase;
 
 namespace SampleApi.Controllers
@@ -22,22 +21,15 @@ namespace SampleApi.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly MessageSender messageSender;
+
         private readonly ActivitySource source = new ActivitySource("Sample");
         private readonly SampleContext db;
-        private readonly HttpClient sampleApiDueClient;
-        private readonly HttpClient sampleApiTreClient;
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger,
-            MessageSender messageSender,
-            SampleContext db,
-            IHttpClientFactory httpClientFactory)
+            SampleContext db)
         {
             _logger = logger;
-            this.messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
             this.db = db ?? throw new ArgumentNullException(nameof(db));
-            this.sampleApiDueClient = httpClientFactory.CreateClient("SampleApiDue");
-            this.sampleApiTreClient = httpClientFactory.CreateClient("SampleApiTre");
         }
 
         [HttpGet]
@@ -45,38 +37,10 @@ namespace SampleApi.Controllers
         {
             using (Activity activity = source.StartActivity("StartController"))
             {
-                using (Activity activityMessage = source.StartActivity("Rabbit").SetTag("type", "RabbitType"))
-                {
-                    _logger.LogInformation("Send message data to rabbitmq");
-                    activityMessage.AddBaggage("baggage-name", "my-value-baggage");
-                    messageSender.SendMessage();
-                    activityMessage.Stop();
-                }
-
                 using (Activity activityMessage = source.StartActivity("Google Activity").SetTag("type", "GoogleType"))
                 {
                     _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
                     var res = await new HttpClient().GetStringAsync("http://google.com");
-                    activityMessage.Stop();
-                }
-
-                using (Activity activityMessage = source.StartActivity("Sample API 2 Activity").SetTag("type", "API 2 Type"))
-                {
-                    _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
-                    _logger.LogInformation($"Base address: {sampleApiDueClient.BaseAddress}/WeatherForecast");
-                    var r = await sampleApiDueClient.GetAsync("WeatherForecast");
-                    var res = await sampleApiDueClient.GetStringAsync("/WeatherForecast");
-                    _logger.LogInformation("Data from API 2: {@res}", res);
-                    activityMessage.Stop();
-                }
-
-                using (Activity activityMessage = source.StartActivity("Sample API 3 Activity").SetTag("type", "API 2 Type"))
-                {
-                    _logger.LogInformation("SampleApi running at: {time}", DateTimeOffset.Now);
-                    _logger.LogInformation($"Base address: {sampleApiDueClient.BaseAddress}/WeatherForecast");
-                    var r = await sampleApiTreClient.GetAsync("WeatherForecast");
-                    var res = await sampleApiTreClient.GetStringAsync("/WeatherForecast");
-                    _logger.LogInformation("Data from API 3: {@res}", res);
                     activityMessage.Stop();
                 }
 
