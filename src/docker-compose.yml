@@ -17,6 +17,8 @@ services:
     environment:
         SA_PASSWORD: "m1Password@12J"
         ACCEPT_EULA: "Y"
+    volumes:
+      - sqlserverdata:/var/lib/sqlserver
 
   zipkin:
     image: openzipkin/zipkin
@@ -57,3 +59,7 @@ services:
       - "13133"       # health_check
     depends_on:
       - otel-collector
+
+volumes:
+  sqlserverdata:
+    driver: local
