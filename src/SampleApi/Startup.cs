@@ -1,4 +1,5 @@
 using System;
+using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +53,10 @@ namespace SampleApi
                         })
                         .AddHttpClientInstrumentation()
                         .AddConsoleExporter()
+                        .AddAzureMonitorTraceExporter(o =>
+                        {
+                            o.ConnectionString = "InstrumentationKey=61ac831c-6667-401f-ba62-962b20f604a1;IngestionEndpoint=https://westeurope-2.in.applicationinsights.azure.com/";
+                        })
                         .AddOtlpExporter(otlpOptions =>
                         {
                             otlpOptions.Endpoint = new Uri("http://otel-collector:4317");
