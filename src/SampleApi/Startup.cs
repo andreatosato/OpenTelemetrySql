@@ -37,8 +37,8 @@ namespace SampleApi
             services.AddDbContext<SampleContext>(x =>
             {
                 x.UseSqlServer(Configuration.GetConnectionString("Default"))
-                .EnableSensitiveDataLogging()
-                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                    .EnableSensitiveDataLogging()
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
 
             services.AddOpenTelemetryTracing((builder) => builder
@@ -61,11 +61,11 @@ namespace SampleApi
                         //    options.ApiKey = Configuration.GetValue<string>("NewRelic:ApiKey");
                         //    options.Endpoint = new Uri("https://metric-api.eu.newrelic.com/trace/v1");
                         //})
-                        //.AddZipkinExporter(b =>
-                        //{
-                        //    var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
-                        //    b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
-                        //})
+                        .AddZipkinExporter(b =>
+                        {
+                            var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
+                            b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                        })
                         //.AddJaegerExporter(b =>
                         //{
                         //    b.AgentHost = "jaeger";

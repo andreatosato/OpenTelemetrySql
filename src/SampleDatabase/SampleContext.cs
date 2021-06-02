@@ -1,11 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using System;
 
 namespace SampleDatabase
 {
     public class SampleContext : DbContext
     {
+        private readonly ActivitySource source = new ActivitySource("Sample");
+        private Activity activityMessage;
+
         public DbSet<PostEntity> Posts { get; set; }
         public DbSet<BlogEntity> Blogs { get; set; }
         public DbSet<UserEntity> Users { get; set; }
@@ -13,6 +17,33 @@ namespace SampleDatabase
 
         public SampleContext(DbContextOptions options) : base(options)
         {
+            this.SaveChangesFailed += SampleContext_SaveChangesFailed;
+            this.SavingChanges += SampleContext_SavingChanges;
+            this.SavedChanges += SampleContext_SavedChanges;
+        }
+
+        private void SampleContext_SavedChanges(object sender, SavedChangesEventArgs e)
+        {
+            activityMessage.SetEndTime(DateTime.UtcNow);
+            activityMessage.AddEvent(new ActivityEvent("End Query"));
+            activityMessage.Stop();
+        }
+
+        private void SampleContext_SavingChanges(object sender, SavingChangesEventArgs e)
+        {
+            activityMessage = source.StartActivity("Saving Changes");
+            //.SetTag("EF Core", ((SampleContext)sender).ChangeTracker.DebugView.LongView);
+            activityMessage.SetStartTime(DateTime.UtcNow);
+            activityMessage.AddEvent(new ActivityEvent("Start Quering"));
+        }
+
+        private void SampleContext_SaveChangesFailed(object sender, SaveChangesFailedEventArgs e)
+        {
+            using (var activityFailedMessage = source.StartActivity("Failed Message"))
+            {
+                //activityFailedMessage.AddBaggage("Error", ((SampleContext)sender).ChangeTracker.DebugView.LongView);
+                activityFailedMessage.Stop();
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

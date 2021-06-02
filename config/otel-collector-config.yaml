@@ -31,6 +31,10 @@ exporters:
     logs:
       host_override: log-api.eu.newrelic.com
 
+  elasticsearch:
+    endpoints:
+    - "https://elasticsearch:9200"
+
 processors:
   batch:
 

@@ -89,6 +89,14 @@ namespace SampleApi.Controllers
                                         .Include(x => x.PostUsers)
                                             .ThenInclude(t => t.Post)
                                         .ToListAsync();
+
+                    blog.First().PostUsers.Add(new PostUserEntity
+                    {
+                        Post = new PostEntity { Text = "Aggiunta data", CreateDate = DateTime.Now },
+                        User = blog.First().PostUsers.First().User
+                    });
+                    await db.SaveChangesAsync();
+
                     activityMessage.Stop();
                 }
 

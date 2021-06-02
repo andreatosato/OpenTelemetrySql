@@ -15,6 +15,9 @@ exporters:
     insecure: true
   logging:
     loglevel: debug
+  elastic:
+    apm_server_url: 'http://apm-server' 
+    secret_token: 'apm-server-key-otel'
 
 processors:
   batch:
@@ -32,8 +35,8 @@ service:
     traces:
       receivers: [otlp, opencensus, jaeger, zipkin]
       processors: [batch]
-      exporters: [otlp, logging]
+      exporters: [otlp, logging, elastic]
     metrics:
       receivers: [otlp, opencensus]
       processors: [batch]
-      exporters: [otlp, logging]
+      exporters: [otlp, logging, elastic]
