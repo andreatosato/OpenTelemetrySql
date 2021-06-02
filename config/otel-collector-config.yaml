@@ -2,6 +2,7 @@ receivers:
   otlp:
     protocols:
       grpc:
+      http:
 
 exporters:
   logging:
@@ -51,8 +52,8 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, zipkin, jaeger]
+      exporters: [logging, zipkin, jaeger, newrelic, elasticsearch]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, prometheus]
+      exporters: [logging, prometheus, newrelic, elasticsearch]

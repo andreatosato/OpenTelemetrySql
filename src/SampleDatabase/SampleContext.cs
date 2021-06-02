@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -7,7 +8,7 @@ namespace SampleDatabase
 {
     public class SampleContext : DbContext
     {
-        private readonly ActivitySource source = new ActivitySource("Sample");
+        private readonly ActivitySource source = new ActivitySource("EF-Core");
         private Activity activityMessage;
 
         public DbSet<PostEntity> Posts { get; set; }
@@ -24,9 +25,16 @@ namespace SampleDatabase
 
         private void SampleContext_SavedChanges(object sender, SavedChangesEventArgs e)
         {
-            activityMessage.SetEndTime(DateTime.UtcNow);
+            activityMessage = source.StartActivity("Saved Changes");
+            activityMessage.AddEvent(new ActivityEvent("Init Saved Changes"));
+            activityMessage.AddTag("TagIni", "Init");
+            Task.Delay(1000).Wait();
             activityMessage.AddEvent(new ActivityEvent("End Query"));
+            activityMessage.AddTag("TagEnd", "End");
             activityMessage.Stop();
+            Task.Delay(200).Wait();
+            activityMessage.SetEndTime(DateTime.UtcNow);
+            activityMessage.AddTag("TagStop", "Stop");
         }
 
         private void SampleContext_SavingChanges(object sender, SavingChangesEventArgs e)
@@ -35,6 +43,10 @@ namespace SampleDatabase
             //.SetTag("EF Core", ((SampleContext)sender).ChangeTracker.DebugView.LongView);
             activityMessage.SetStartTime(DateTime.UtcNow);
             activityMessage.AddEvent(new ActivityEvent("Start Quering"));
+            activityMessage.AddBaggage("BaggageOne", "1");
+            activityMessage.AddBaggage("BaggageTwo", "2");
+            //activityMessage.DisplayName = "EF Core SQL";
+            activityMessage.Stop();
         }
 
         private void SampleContext_SaveChangesFailed(object sender, SaveChangesFailedEventArgs e)

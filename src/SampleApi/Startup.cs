@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -38,11 +40,19 @@ namespace SampleApi
             {
                 x.UseSqlServer(Configuration.GetConnectionString("Default"))
                     .EnableSensitiveDataLogging()
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                    .LogTo((m) =>
+                        {
+                            ActivitySource source = new ActivitySource("EF-Core");
+                            var activityMessage = source.StartActivity("Insert-Statement");
+                            activityMessage.AddTag("db.statement", m);
+                        },
+                        new[] { RelationalEventId.CommandExecuted }
+                    );
             });
 
             services.AddOpenTelemetryTracing((builder) => builder
-                        .AddSource("Sample")
+                        .AddSource("Sample", "EF-Core")
                         .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("SampleApi").AddTelemetrySdk())
                         .AddSqlClientInstrumentation(s =>
                         {
@@ -61,11 +71,11 @@ namespace SampleApi
                         //    options.ApiKey = Configuration.GetValue<string>("NewRelic:ApiKey");
                         //    options.Endpoint = new Uri("https://metric-api.eu.newrelic.com/trace/v1");
                         //})
-                        .AddZipkinExporter(b =>
-                        {
-                            var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
-                            b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
-                        })
+                        //.AddZipkinExporter(b =>
+                        //{
+                        //    var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
+                        //    b.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                        //})
                         //.AddJaegerExporter(b =>
                         //{
                         //    b.AgentHost = "jaeger";
