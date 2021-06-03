@@ -67,7 +67,10 @@ namespace SampleApi
                         {
                             o.ConnectionString = "InstrumentationKey=61ac831c-6667-401f-ba62-962b20f604a1;IngestionEndpoint=https://westeurope-2.in.applicationinsights.azure.com/";
                         })
-                        .AddZipkinExporter(z => z.Endpoint = new Uri(""))
+                        .AddZipkinExporter(b =>
+                        {
+                            b.Endpoint = new Uri($"http://zipkin:9411/api/v2/spans");
+                        })
                         .AddOtlpExporter(otlpOptions =>
                         {
                             otlpOptions.Endpoint = new Uri("http://otel-collector:4317");
