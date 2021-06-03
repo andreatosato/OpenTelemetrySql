@@ -42,17 +42,14 @@ namespace SampleApi
                 {
                     ActivitySource source = new ActivitySource("EF-Core");
                     var activityMessage = source.StartActivity("Insert-Statement");
-                    if (activityMessage != null)
-                    {
-                        activityMessage.AddTag("db.statement", m);
-                    }
+                    activityMessage?.AddTag("db.statement", m);
                 },
                 new[] { RelationalEventId.CommandExecuted, RelationalEventId.CommandExecuting, RelationalEventId.ConnectionClosed }
                 );
             });
 
             services.AddOpenTelemetryTracing((builder) => builder
-                        .AddSource("Sample")
+                        .AddSource("Sample", "EF-Core")
                         .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("SampleApi").AddTelemetrySdk())
                         .AddSqlClientInstrumentation(s =>
                         {
@@ -70,6 +67,7 @@ namespace SampleApi
                         {
                             o.ConnectionString = "InstrumentationKey=61ac831c-6667-401f-ba62-962b20f604a1;IngestionEndpoint=https://westeurope-2.in.applicationinsights.azure.com/";
                         })
+                        .AddZipkinExporter(z => z.Endpoint = new Uri(""))
                         .AddOtlpExporter(otlpOptions =>
                         {
                             otlpOptions.Endpoint = new Uri("http://otel-collector:4317");
