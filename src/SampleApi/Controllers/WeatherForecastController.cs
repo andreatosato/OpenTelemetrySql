@@ -53,6 +53,13 @@ namespace SampleApi.Controllers
                                         .Include(x => x.PostUsers)
                                             .ThenInclude(t => t.Post)
                                         .ToListAsync();
+
+
+                    var myStoredData = db.StoredData.FromSqlRaw("StoredData").ToListAsync();
+
+                    db.Users.Add(new UserEntity { Name = "SQL", Surname = "Start" });
+                    await db.SaveChangesAsync();
+
                     activityMessage.Stop();
                 }
 

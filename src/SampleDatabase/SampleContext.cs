@@ -12,6 +12,7 @@ namespace SampleDatabase
         public DbSet<BlogEntity> Blogs { get; set; }
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<PostUserEntity> PostUsers { get; set; }
+        public DbSet<StoredData> StoredData { get; set; }
         private readonly ActivitySource source = new ActivitySource("EF-Core");
         private Activity activityMessage;
 
