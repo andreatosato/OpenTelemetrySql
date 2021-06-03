@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,7 +37,18 @@ namespace SampleApi
             {
                 x.UseSqlServer(Configuration.GetConnectionString("Default"))
                 .EnableSensitiveDataLogging()
-                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                .LogTo((m) =>
+                {
+                    ActivitySource source = new ActivitySource("EF-Core");
+                    var activityMessage = source.StartActivity("Insert-Statement");
+                    if (activityMessage != null)
+                    {
+                        activityMessage.AddTag("db.statement", m);
+                    }
+                },
+                new[] { RelationalEventId.CommandExecuted, RelationalEventId.CommandExecuting, RelationalEventId.ConnectionClosed }
+                );
             });
 
             services.AddOpenTelemetryTracing((builder) => builder
