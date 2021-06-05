@@ -1,34 +1,28 @@
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using SampleWorker.Messages;
+using SampleWorker.Services;
 
 namespace SampleWorker
 {
     public partial class Worker : BackgroundService
     {
-        private readonly MessageReceiver messageReceiver;
-
-        public Worker(MessageReceiver messageReceiver)
-        {
-            this.messageReceiver = messageReceiver;
-        }
-
-        public override Task StartAsync(CancellationToken cancellationToken)
-        {
-            return base.StartAsync(cancellationToken);
-        }
-
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            await base.StopAsync(cancellationToken);
-        }
-
+        public static ActivitySource activitySource = new ActivitySource("SampleWorker");
+        public static Activity importerActivity;
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            stoppingToken.ThrowIfCancellationRequested();
-
-            this.messageReceiver.StartConsumer();
+            importerActivity = activitySource.StartActivity("Importer");
+            {
+                var filePath = Path.Combine(System.AppContext.BaseDirectory, "workerfile.txt");
+                List<Task> userTasks = new List<Task>();
+                await foreach (var u in WorkerFileReader.ReadData(filePath))
+                {
+                    await DatabaseWriter.InsertUserAsync(u);
+                }
+            }
 
             await Task.CompletedTask;
         }

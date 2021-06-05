@@ -1,79 +1,19 @@
-version: '3.7'
-
 services:
-  sampleapi:
-    image: ${DOCKER_REGISTRY-}sampleapi
-    build:
-      context: SampleApi
-      dockerfile: ./Dockerfile
-    environment:
-      - RABBITMQ_HOSTNAME=rabbitmq
-      - RABBITMQ_DEFAULT_PASS=sAmple2021
-      - RABBITMQ_DEFAULT_USER=sample
-      - ZIPKIN_HOSTNAME=zipkin
-      - Jaeger__AgentHost=jaeger
-    depends_on:
-      - rabbitmq
-      - zipkin
-      - jaeger
-      - db
-      - sampleworker
-      - sampleapitre
-      - prometheus
-
-  sampleapidue:
-    image: ${DOCKER_REGISTRY-}sampleapidue
-    build:
-      context: SampleApiDue
-      dockerfile: ./Dockerfile
-    environment:
-      - ZIPKIN_HOSTNAME=zipkin
-    depends_on:
-      - zipkin
-
-  sampleapitre:
-    image: ${DOCKER_REGISTRY-}sampleapitre
-    build:
-      context: SampleApi3
-      dockerfile: ./Dockerfile
-    environment:
-      - ZIPKIN_HOSTNAME=zipkin
-    depends_on:
-      - zipkin
-
   sampleworker:
     image: ${DOCKER_REGISTRY-}sampleworker
     build:
       context: SampleWorker
       dockerfile: ./Dockerfile
     environment:
-      - RABBITMQ_HOSTNAME=rabbitmq
-      - RABBITMQ_DEFAULT_PASS=sAmple2021
-      - RABBITMQ_DEFAULT_USER=sample
       - ZIPKIN_HOSTNAME=zipkin
+      - SqlConnection=Server=sqlserver;Database=Worker;User Id=sa;Password=m1Password@12J;
     restart: on-failure
     depends_on:
-      - rabbitmq
       - zipkin
-
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: rabbitmq
-    hostname: rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: "sample"
-      RABBITMQ_DEFAULT_PASS: "sAmple2021"
-      RABBITMQ_DEFAULT_VHOST: "/"
-    ports:        
-        - "5672:5672"
-        - "15672:15672"
-    volumes:
-        - rabbitmqdata/:/var/lib/rabbitmq/
-        - rabbitmqdata/:/var/log/rabbitmq/
 
   db:
     image: "mcr.microsoft.com/mssql/server"
-    container_name: sqlserver
+    #container_name: sqlserver
     ports:
         - 1433:1433
     environment:
@@ -86,7 +26,7 @@ services:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
-      - 9412:9411
+      - 9411:9411
 
   jaeger:
     image: jaegertracing/all-in-one
@@ -97,23 +37,10 @@ services:
       - 5778:5778
       - 6831:6831/udp
       - 6832:6832/udp
-      - 9411:9411
+      - 9412:9411
       - 14268:14268
-      - 16686:16686
-
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    volumes:
-      - prometheus:/prometheus
-      - ./../config/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - 9090:9090
-    restart: on-failure
+      - 16686:16686 # UI
 
 volumes:
   sqlserverdata:
     driver: local
-  rabbitmqdata:
-    driver: local
-  prometheus:
