@@ -32,9 +32,9 @@ exporters:
     logs:
       host_override: log-api.eu.newrelic.com
 
-  elasticsearch:
-    endpoints:
-    - "https://elasticsearch:9200"
+  #elasticsearch:
+  #  endpoints:
+  #  - "https://elasticsearch:9200"
 
 processors:
   batch:
@@ -52,8 +52,8 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, zipkin, jaeger, newrelic, elasticsearch]
+      exporters: [logging, zipkin, jaeger, newrelic]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, prometheus, newrelic, elasticsearch]
+      exporters: [logging, prometheus, newrelic]
