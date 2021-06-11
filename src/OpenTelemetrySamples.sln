@@ -14,12 +14,6 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleDatabase", "SampleDatabase\SampleDatabase.csproj", "{0AF58D79-5D2F-4F65-968A-F8D8676425E1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "otel", "otel", "{2176E700-3911-40BE-AC7F-80EA8E717E22}"
-	ProjectSection(SolutionItems) = preProject
-		..\config\otel-agent-config.yaml = ..\config\otel-agent-config.yaml
-		..\config\otel-collector-config.yaml = ..\config\otel-collector-config.yaml
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
