@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -14,48 +13,10 @@ namespace SampleDatabase
         public DbSet<PostUserEntity> PostUsers { get; set; }
         public DbSet<StoredData> StoredData { get; set; }
         private readonly ActivitySource source = new ActivitySource("EF-Core");
-        private Activity activityMessage;
+        private readonly Activity activityMessage;
 
         public SampleContext(DbContextOptions options) : base(options)
         {
-            this.SaveChangesFailed += SampleContext_SaveChangesFailed;
-            this.SavingChanges += SampleContext_SavingChanges;
-            this.SavedChanges += SampleContext_SavedChanges;
-        }
-
-        private void SampleContext_SavedChanges(object sender, SavedChangesEventArgs e)
-        {
-            activityMessage = source.StartActivity("Saved Changes");
-            activityMessage.AddEvent(new ActivityEvent("Init Saved Changes"));
-            activityMessage.AddTag("TagIni", "Init");
-            Task.Delay(1000).Wait();
-            activityMessage.AddEvent(new ActivityEvent("End Query"));
-            activityMessage.AddTag("TagEnd", "End");
-            activityMessage.Stop();
-            Task.Delay(200).Wait();
-            activityMessage.SetEndTime(DateTime.UtcNow);
-            activityMessage.AddTag("TagStop", "Stop");
-        }
-
-        private void SampleContext_SavingChanges(object sender, SavingChangesEventArgs e)
-        {
-            activityMessage = source.StartActivity("Saving Changes");
-            //.SetTag("EF Core", ((SampleContext)sender).ChangeTracker.DebugView.LongView);
-            activityMessage.SetStartTime(DateTime.UtcNow);
-            activityMessage.AddEvent(new ActivityEvent("Start Quering"));
-            activityMessage.AddBaggage("BaggageOne", "1");
-            activityMessage.AddBaggage("BaggageTwo", "2");
-            //activityMessage.DisplayName = "EF Core SQL";
-            activityMessage.Stop();
-        }
-
-        private void SampleContext_SaveChangesFailed(object sender, SaveChangesFailedEventArgs e)
-        {
-            using (var activityFailedMessage = source.StartActivity("Failed Message"))
-            {
-                //activityFailedMessage.AddBaggage("Error", ((SampleContext)sender).ChangeTracker.DebugView.LongView);
-                activityFailedMessage.Stop();
-            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

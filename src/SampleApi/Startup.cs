@@ -71,10 +71,10 @@ namespace SampleApi
                         {
                             b.Endpoint = new Uri($"http://zipkin:9411/api/v2/spans");
                         })
-                        .AddOtlpExporter(otlpOptions =>
-                        {
-                            otlpOptions.Endpoint = new Uri("http://otel-collector:4317");
-                        })
+                    //.AddOtlpExporter(otlpOptions =>
+                    //{
+                    //    otlpOptions.Endpoint = new Uri("http://otel-collector:4317");
+                    //})
 
                     );
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
@@ -86,7 +86,7 @@ namespace SampleApi
         {
             if (env.IsDevelopment())
             {
-                db.Database.Migrate();
+                //db.Database.Migrate();
 
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
