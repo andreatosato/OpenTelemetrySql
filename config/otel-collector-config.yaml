@@ -22,6 +22,11 @@ exporters:
       host_override: metric-api.eu.newrelic.com
     logs:
       host_override: log-api.eu.newrelic.com
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: promexample
+    const_labels:
+      label1: value1
 
 processors:
   batch:
@@ -43,4 +48,4 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, zipkin, newrelic]
+      exporters: [logging, zipkin, newrelic, prometheus]

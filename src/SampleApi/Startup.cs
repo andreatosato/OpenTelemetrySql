@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -63,17 +62,17 @@ namespace SampleApi
                         })
                         .AddHttpClientInstrumentation()
                         .AddConsoleExporter()
-                        .AddAzureMonitorTraceExporter(o =>
-                        {
-                            o.ConnectionString = "InstrumentationKey=61ac831c-6667-401f-ba62-962b20f604a1;IngestionEndpoint=https://westeurope-2.in.applicationinsights.azure.com/";
-                        })
-                        .AddZipkinExporter(b =>
-                        {
-                            b.Endpoint = new Uri($"http://zipkin:9411/api/v2/spans");
-                        })
+                        //.AddAzureMonitorTraceExporter(o =>
+                        //{
+                        //    o.ConnectionString = "InstrumentationKey=61ac831c-6667-401f-ba62-962b20f604a1;IngestionEndpoint=https://westeurope-2.in.applicationinsights.azure.com/";
+                        //})
+                        //.AddZipkinExporter(b =>
+                        //{
+                        //    b.Endpoint = new Uri($"http://zipkin:9411/api/v2/spans");
+                        //})
                         .AddOtlpExporter(otlpOptions =>
                         {
-                            otlpOptions.Endpoint = new Uri("http://otel-collector:4317");
+                            otlpOptions.Endpoint = new Uri("http://otel-agent:4317");
                         })
 
                     );
