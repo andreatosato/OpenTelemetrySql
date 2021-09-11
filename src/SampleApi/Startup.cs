@@ -72,7 +72,7 @@ namespace SampleApi
                         //})
                         .AddOtlpExporter(otlpOptions =>
                         {
-                            otlpOptions.Endpoint = new Uri("http://otel-agent:4317");
+                            otlpOptions.Endpoint = new Uri("http://otel-collector:4317");
                         })
 
                     );

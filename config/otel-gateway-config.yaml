@@ -3,18 +3,13 @@ receivers:
     protocols:
       grpc:
       http:
-  zipkin:
 
 exporters:
-  otlp:
-    endpoint: otel-collector:4317
-    insecure: true
   logging:
     loglevel: debug
 
   zipkin:
     endpoint: "http://zipkin:9411/api/v2/spans"
-    format: proto
 
   newrelic:
     apikey: NRAK-LJIAVTJ8KIG666PH5DXDCBRB2EG
@@ -33,6 +28,10 @@ exporters:
     const_labels:
       label1: value1
 
+  jaeger:
+    endpoint: jaeger:14250
+    insecure: true
+
 processors:
   batch:
 
@@ -49,8 +48,8 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp, logging, zipkin, newrelic]
+      exporters: [logging, zipkin, newrelic, jaeger]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp, logging, newrelic, prometheus]
+      exporters: [logging, newrelic, prometheus]

@@ -2,18 +2,20 @@ receivers:
   otlp:
     protocols:
       grpc:
-      http:
 
 exporters:
-  logging:
-    loglevel: debug
+  otlp:
+    endpoint: otel-gateway:4317
+    insecure: true
+
+  #logging:
+  #  loglevel: debug
 
   zipkin:
     endpoint: "http://zipkin:9411/api/v2/spans"
-    format: proto
 
   newrelic:
-    apikey: NRAK-LJIAVTJ8KIG666PH5DXDCBRB2EG
+    apikey: eu01xx9a5bdbfeb8fda097df1b4edb17FFFFNRAL
     timeout: 30s
     traces:
       host_override: trace-api.eu.newrelic.com
@@ -22,11 +24,16 @@ exporters:
       host_override: metric-api.eu.newrelic.com
     logs:
       host_override: log-api.eu.newrelic.com
+
   prometheus:
     endpoint: "0.0.0.0:8889"
     namespace: promexample
     const_labels:
       label1: value1
+
+  jaeger:
+    endpoint: jaeger:14250
+    insecure: true
 
 processors:
   batch:
@@ -44,8 +51,8 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, zipkin, newrelic]
+      exporters: [otlp, zipkin, newrelic, jaeger]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, zipkin, newrelic, prometheus]
+      exporters: [otlp, newrelic, prometheus]
