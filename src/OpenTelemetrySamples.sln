@@ -17,7 +17,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "otel", "otel", "{2176E700-3911-40BE-AC7F-80EA8E717E22}"
 	ProjectSection(SolutionItems) = preProject
 		..\config\otel-collector-config.yaml = ..\config\otel-collector-config.yaml
-		..\config\otel-gateway-config.yaml = ..\config\otel-gateway-config.yaml
 	EndProjectSection
 EndProject
 Global
